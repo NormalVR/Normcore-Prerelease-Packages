@@ -1,0 +1,10 @@
+{
+  "name": "com.normalvr.normcore.services",
+  "version": "0.1.0",
+  "displayName": "Normcore Services",
+  "description": "Clients for the Normcore Services API",
+  "unity": "2019.4",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.2.1"
+  }
+}

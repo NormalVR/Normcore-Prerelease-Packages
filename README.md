@@ -8,4 +8,4 @@ From the Package Manager window, click the plus button to add a package and sele
 
 | Package           | URL                                                                                             |
 | ----------------- | ----------------------------------------------------------------------------------------------- |
-| Normcore Services | `git@github.com:NormalVR/Normcore-Prerelease-Packages.git?path=com.normalvr.normcore-services`  |
+| Normcore Services | `git@github.com:NormalVR/Normcore-Prerelease-Packages.git?path=com.normalvr.normcore.services`  |
