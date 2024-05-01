@@ -2,11 +2,11 @@
 
 namespace Normcore.Services
 {
-    public struct UsersService
+    public class UsersService
     {
-        private AuthenticatedContext auth;
+        private IAuthentication auth;
 
-        public UsersService(AuthenticatedContext auth)
+        public UsersService(IAuthentication auth)
         {
             this.auth = auth;
         }

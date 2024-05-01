@@ -5,7 +5,7 @@
         /// <summary>
         /// The default public Normcore Services host.
         /// </summary>
-        public const string DefaultHost = "https://default.services.normcore.io";
+        public const string DefaultHost = "https://alpha.services.normcore.io";
 
         /// <summary>
         /// The host (complete root API URL, including protocol) used to make service requests.

@@ -2,7 +2,7 @@
 
 namespace Normcore.Services
 {
-    public struct StatusService
+    public class StatusService
     {
         /// <summary>
         /// Get the status of the API server.

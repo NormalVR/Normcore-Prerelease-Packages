@@ -1,12 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Normcore.Services
 {
-    public struct LobbiesService
+    public class LobbiesService
     {
-        private AuthenticatedContext auth;
+        private IAuthentication auth;
 
-        internal LobbiesService(AuthenticatedContext auth)
+        internal LobbiesService(IAuthentication auth)
         {
             this.auth = auth;
         }
@@ -189,7 +190,12 @@ namespace Normcore.Services
         /// <param name="lobbyID">The ID of the lobby.</param>
         public async ValueTask LeaveLobby(string lobbyID)
         {
-            var response = await NormcoreServicesRequest.Delete($"lobbies/{lobbyID}/members/{auth.UserID}").WithAuth(auth).Send();
+            if (auth is not UserAuthentication uauth)
+            {
+                throw new NotImplementedException();
+            }
+
+            var response = await NormcoreServicesRequest.Delete($"lobbies/{lobbyID}/members/{uauth.UserID}").WithAuth(auth).Send();
 
             if (response.Status == 204)
             {

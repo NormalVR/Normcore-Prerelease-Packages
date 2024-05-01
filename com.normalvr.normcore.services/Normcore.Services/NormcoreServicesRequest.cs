@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -39,7 +40,7 @@ namespace Normcore.Services
         {
             var req = UnityWebRequest.Put(GetEndpointURL(endpoint), JSON.Serialize(data));
 
-            req.SetRequestHeader("Content-Type", JSONContentType); // UnityWebRequest.Put has no content type parameter
+            req.SetRequestHeader("Content-Type", JSONContentType);
 
             return new NormcoreServicesRequest { UnityWebRequest = req };
         }
@@ -49,8 +50,17 @@ namespace Normcore.Services
         /// </summary>
         public static NormcoreServicesRequest Post(string endpoint)
         {
-            var req = UnityWebRequest.Post(GetEndpointURL(endpoint), "{}", JSONContentType);
+#if UNITY_2022_1_OR_NEWER
+            var req = UnityWebRequest.Post(GetEndpointURL(endpoint), string.Empty, JSONContentType);
+#else
+            // Unity 2021 and earlier automatically applies URL encoding to the request body
+            // when using UnityWebRequest.Post, so we have to manually create a POST request
+            // with the raw UTF8 bytes to send a JSON body.
 
+            var req = UnityWebRequest.Post(GetEndpointURL(endpoint), string.Empty);
+
+            req.SetRequestHeader("Content-Type", JSONContentType);
+#endif
             return new NormcoreServicesRequest { UnityWebRequest = req };
         }
 
@@ -59,8 +69,20 @@ namespace Normcore.Services
         /// </summary>
         public static NormcoreServicesRequest Post<T>(string endpoint, T data)
         {
+#if UNITY_2022_1_OR_NEWER
             var req = UnityWebRequest.Post(GetEndpointURL(endpoint), JSON.Serialize(data), JSONContentType);
+#else
+            // Unity 2021 and earlier automatically applies URL encoding to the request body
+            // when using UnityWebRequest.Post, so we have to manually create a POST request
+            // with the raw UTF8 bytes to send a JSON body.
 
+            var dlHandler = new DownloadHandlerBuffer();
+            var upHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(JSON.Serialize(data)));
+
+            var req = new UnityWebRequest(GetEndpointURL(endpoint), "POST", dlHandler, upHandler);
+
+            req.SetRequestHeader("Content-Type", JSONContentType);
+#endif
             return new NormcoreServicesRequest { UnityWebRequest = req };
         }
 
@@ -86,9 +108,9 @@ namespace Normcore.Services
         /// <summary>
         /// Add an authorization header to the request with a builder-style syntax.
         /// </summary>
-        public NormcoreServicesRequest WithAuth(AuthenticatedContext auth)
+        public NormcoreServicesRequest WithAuth(IAuthentication auth)
         {
-            return WithHeader("Authorization", $"Bearer {auth.Token}");
+            return WithHeader("Authorization", $"Bearer {auth.AccessToken}");
         }
 
         /// <summary>

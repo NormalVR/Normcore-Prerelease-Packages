@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Normcore.Services
 {
     [JsonObject]
-    public struct CreateAnonymousUserResult
+    internal struct CreateAnonymousUserResult
     {
         [JsonProperty("user")] public UserObject User;
 
@@ -14,7 +14,13 @@ namespace Normcore.Services
     }
 
     [JsonObject]
-    public struct AnonymousAuth
+    internal struct AuthenticateAnonymousUserResult
+    {
+        [JsonProperty("token")] public string Token;
+    }
+
+    [JsonObject]
+    internal struct AnonymousAuth
     {
         [JsonProperty("secret")] public string Secret;
     }
@@ -27,22 +33,28 @@ namespace Normcore.Services
         [JsonProperty("secret")] public string Secret;
     }
 
-    public struct AuthService
+    internal static class AuthService
     {
-        private string key;
-
         private const string NormcoreAppKeyHeader = "Normcore-App-Key";
 
-        /// <summary>
-        /// Create a new AuthService context.
-        /// </summary>
-        /// <param name="key">The API key to use during authentication.</param>
-        public AuthService(string key)
+        public static async ValueTask<CreateAnonymousUserResult> CreateAnonymousUser(string key)
         {
-            this.key = key;
+            var response = await NormcoreServicesRequest
+                .Post("auth/user/anon/create")
+                .WithHeader(NormcoreAppKeyHeader, key)
+                .Send();
+
+            if (response.Status == 200)
+            {
+                return response.ParseDataResponse<CreateAnonymousUserResult>();
+            }
+
+            // TODO add expected error responses
+
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
 
-        public async ValueTask<AnonymousAuth> AuthenticateAnonymousUser(string id, string secret)
+        public static async ValueTask<AuthenticateAnonymousUserResult> AuthenticateAnonymousUser(string key, string id, string secret)
         {
             var body = new RefreshAnonymousUserTokenRequestData { ID = id, Secret = secret };
 
@@ -53,24 +65,7 @@ namespace Normcore.Services
 
             if (response.Status == 200)
             {
-                return response.ParseDataResponse<AnonymousAuth>();
-            }
-
-            // TODO add expected error responses
-
-            throw NormcoreServicesException.UnexpectedResponse(response);
-        }
-
-        public async ValueTask<CreateAnonymousUserResult> CreateAnonymousUser()
-        {
-            var response = await NormcoreServicesRequest
-                .Post("auth/user/anon/create")
-                .WithHeader(NormcoreAppKeyHeader, key)
-                .Send();
-
-            if (response.Status == 200)
-            {
-                return response.ParseDataResponse<CreateAnonymousUserResult>();
+                return response.ParseDataResponse<AuthenticateAnonymousUserResult>();
             }
 
             // TODO add expected error responses

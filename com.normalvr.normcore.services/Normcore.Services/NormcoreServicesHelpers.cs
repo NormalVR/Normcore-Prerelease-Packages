@@ -9,7 +9,7 @@ namespace Normcore.Services
         /// Create a coroutine that heartbeats a user session on a regular basis.
         /// </summary>
         /// <param name="client">The client instance to heartbeat.</param>
-        public static IEnumerator HeartbeatRoutine(NormcoreServicesClient client)
+        public static IEnumerator HeartbeatRoutine(NormcoreServices client)
         {
             while (true)
             {
