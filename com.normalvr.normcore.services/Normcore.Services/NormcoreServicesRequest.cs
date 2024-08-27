@@ -18,15 +18,15 @@ namespace Normcore.Services
         /// <summary>
         /// Map an API endpoint to a full qualified URL using the Normcore settings.
         /// </summary>
-        private static string GetEndpointURL(string endpoint)
+        private static string GetEndpointURL(ValidatedPath endpoint)
         {
-            return $"{NormcoreServicesSettings.Host}/{endpoint}";
+            return $"{NormcoreServicesSettings.Host}/{endpoint.Value}";
         }
 
         /// <summary>
         /// Make an unauthenticated GET request to the service backend.
         /// </summary>
-        public static NormcoreServicesRequest Get(string endpoint)
+        public static NormcoreServicesRequest Get(ValidatedPath endpoint)
         {
             var req = UnityWebRequest.Get(GetEndpointURL(endpoint));
 
@@ -36,7 +36,7 @@ namespace Normcore.Services
         /// <summary>
         /// Make an unauthenticated PUT request to the service backend with data.
         /// </summary>
-        public static NormcoreServicesRequest Put<T>(string endpoint, T data)
+        public static NormcoreServicesRequest Put<T>(ValidatedPath endpoint, T data)
         {
             var req = UnityWebRequest.Put(GetEndpointURL(endpoint), JSON.Serialize(data));
 
@@ -48,7 +48,7 @@ namespace Normcore.Services
         /// <summary>
         /// Make an unauthenticated POST request to the service backend without data.
         /// </summary>
-        public static NormcoreServicesRequest Post(string endpoint)
+        public static NormcoreServicesRequest Post(ValidatedPath endpoint)
         {
 #if UNITY_2022_1_OR_NEWER
             var req = UnityWebRequest.Post(GetEndpointURL(endpoint), string.Empty, JSONContentType);
@@ -67,7 +67,7 @@ namespace Normcore.Services
         /// <summary>
         /// Make an unauthenticated POST request to the service backend with data.
         /// </summary>
-        public static NormcoreServicesRequest Post<T>(string endpoint, T data)
+        public static NormcoreServicesRequest Post<T>(ValidatedPath endpoint, T data)
         {
 #if UNITY_2022_1_OR_NEWER
             var req = UnityWebRequest.Post(GetEndpointURL(endpoint), JSON.Serialize(data), JSONContentType);
@@ -89,7 +89,7 @@ namespace Normcore.Services
         /// <summary>
         /// Make an unauthenticated DELETE request to the service backend.
         /// </summary>
-        public static NormcoreServicesRequest Delete(string endpoint)
+        public static NormcoreServicesRequest Delete(ValidatedPath endpoint)
         {
             var req = UnityWebRequest.Delete(GetEndpointURL(endpoint));
 

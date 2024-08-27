@@ -1,6 +1,6 @@
 {
   "name": "com.normalvr.normcore.services",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "displayName": "Normcore Services",
   "description": "Clients for the Normcore Services API",
   "unity": "2021.3",

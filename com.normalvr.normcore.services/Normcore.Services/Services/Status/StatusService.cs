@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using static Normcore.Services.Validation;
 
 namespace Normcore.Services
 {
@@ -10,7 +11,10 @@ namespace Normcore.Services
         /// <returns>True if the API server is accessible.</returns>
         public async ValueTask<bool> Get()
         {
-            return (await NormcoreServicesRequest.Get("status").Send()).Status == 200;
+            var endpoint = FormatPath("status");
+            var response = await NormcoreServicesRequest.Get(endpoint).Send();
+
+            return response.Status == 200;
         }
     }
 }

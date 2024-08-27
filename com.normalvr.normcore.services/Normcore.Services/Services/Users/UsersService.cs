@@ -1,14 +1,18 @@
 ﻿using System.Threading.Tasks;
 
+using static Normcore.Services.Validation;
+
 namespace Normcore.Services
 {
     public class UsersService
     {
         private IAuthentication auth;
+        private string appKey;
 
-        public UsersService(IAuthentication auth)
+        public UsersService(IAuthentication auth, string appKey)
         {
             this.auth = auth;
+            this.appKey = appKey;
         }
 
         /// <summary>
@@ -16,7 +20,8 @@ namespace Normcore.Services
         /// </summary>
         public async ValueTask<UserObject> GetSelf()
         {
-            var response = await NormcoreServicesRequest.Get("users/self").WithAuth(auth).Send();
+            var endpoint = FormatPath("apps/{0}/users/self", appKey);
+            var response = await NormcoreServicesRequest.Get(endpoint).WithAuth(auth).Send();
 
             if (response.Status == 200)
             {
@@ -31,9 +36,10 @@ namespace Normcore.Services
         /// <summary>
         /// Get a user by ID.
         /// </summary>
-        public async ValueTask<UserObject> GetUser(string id)
+        public async ValueTask<UserObject> GetUser(string userID)
         {
-            var response = await NormcoreServicesRequest.Get($"users/{id}").WithAuth(auth).Send();
+            var endpoint = FormatPath("apps/{0}/users/{1}", appKey, userID);
+            var response = await NormcoreServicesRequest.Get(endpoint).WithAuth(auth).Send();
 
             if (response.Status == 200)
             {
@@ -50,7 +56,8 @@ namespace Normcore.Services
         /// </summary>
         public async ValueTask Heartbeat()
         {
-            var response = await NormcoreServicesRequest.Post("users/heartbeat").WithAuth(auth).Send();
+            var endpoint = FormatPath("apps/{0}/users/heartbeat", appKey);
+            var response = await NormcoreServicesRequest.Post(endpoint).WithAuth(auth).Send();
 
             if (response.Status == 204)
             {

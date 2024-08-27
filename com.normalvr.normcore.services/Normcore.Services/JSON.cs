@@ -4,7 +4,7 @@ namespace Normcore.Services
 {
     internal static class JSON
     {
-        private static JsonSerializerSettings Settings = new () { NullValueHandling = NullValueHandling.Ignore };
+        private static JsonSerializerSettings Settings = new() { NullValueHandling = NullValueHandling.Ignore };
 
         public static string Serialize<T>(T data)
         {

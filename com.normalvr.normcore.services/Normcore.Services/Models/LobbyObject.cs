@@ -13,6 +13,11 @@ namespace Normcore.Services
         [JsonProperty("id")] public string ID;
 
         /// <summary>
+        /// The name of the lobby.
+        /// </summary>
+        [JsonProperty("name")] public string Name;
+
+        /// <summary>
         /// The maximum capacity of the lobby.
         /// </summary>
         [JsonProperty("size")] public uint Size;

@@ -7,7 +7,7 @@ namespace Normcore.Services
     [JsonConverter(typeof(LobbyDataUpdateConverter))]
     public class LobbyDataUpdate
     {
-        public Dictionary<string, LobbyDataEntry?> Changes = new (); // TODO use non allocating collection
+        public Dictionary<string, LobbyDataEntry?> Changes = new(); // TODO use non allocating collection
 
         /// <summary>
         /// Record a change to create or update a value in the lobby data.

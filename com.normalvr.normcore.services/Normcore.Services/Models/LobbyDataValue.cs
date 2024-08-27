@@ -39,7 +39,7 @@ namespace Normcore.Services
         {
             Type = LobbyDataValueType.Boolean;
 
-            BoolValue   = value;
+            BoolValue = value;
             StringValue = null;
             NumberValue = null;
         }
@@ -48,7 +48,7 @@ namespace Normcore.Services
         {
             Type = LobbyDataValueType.Number;
 
-            BoolValue   = null;
+            BoolValue = null;
             NumberValue = value;
             StringValue = null;
         }
@@ -57,7 +57,7 @@ namespace Normcore.Services
         {
             Type = LobbyDataValueType.Number;
 
-            BoolValue   = null;
+            BoolValue = null;
             NumberValue = value;
             StringValue = null;
         }
@@ -66,7 +66,7 @@ namespace Normcore.Services
         {
             Type = LobbyDataValueType.String;
 
-            BoolValue   = null;
+            BoolValue = null;
             NumberValue = null;
             StringValue = value;
         }

@@ -1,30 +1,35 @@
 ﻿using System;
 using System.Threading.Tasks;
+using static Normcore.Services.Validation;
 
 namespace Normcore.Services
 {
     public class LobbiesService
     {
         private IAuthentication auth;
+        private string appKey;
 
-        internal LobbiesService(IAuthentication auth)
+        internal LobbiesService(IAuthentication auth, string appKey)
         {
             this.auth = auth;
+            this.appKey = appKey;
         }
 
         /// <summary>
         /// Create a lobby.
         /// </summary>
         /// <returns>The lobby properties.</returns>
-        public async ValueTask<LobbyObject> CreateLobby(uint size, string[] tags, LobbyDataContainer data)
+        public async ValueTask<LobbyObject> CreateLobby(uint size, string[] tags, LobbyDataContainer data, string name)
         {
             var body = new CreateLobbyRequestBody();
 
+            body.Name = name;
             body.Size = size;
             body.Tags = tags;
             body.Data = data;
 
-            var response = await NormcoreServicesRequest.Post("lobbies", body).WithAuth(auth).Send();
+            var endpoint = FormatPath("apps/{0}/lobbies", appKey);
+            var response = await NormcoreServicesRequest.Post(endpoint, body).WithAuth(auth).Send();
 
             if (response.Status == 200)
             {
@@ -42,11 +47,31 @@ namespace Normcore.Services
         /// <param name="lobbyID">The ID of the lobby.</param>
         public async ValueTask<LobbyObject> GetLobby(string lobbyID)
         {
-            var response = await NormcoreServicesRequest.Get($"lobbies/{lobbyID}").WithAuth(auth).Send();
+            var endpoint = FormatPath("apps/{0}/lobbies/{1}", appKey, lobbyID);
+            var response = await NormcoreServicesRequest.Get(endpoint).WithAuth(auth).Send();
 
             if (response.Status == 200)
             {
                 return response.ParseDataResponse<LobbyObject>();
+            }
+
+            // TODO handle expected failure responses
+
+            throw NormcoreServicesException.UnexpectedResponse(response);
+        }
+
+        /// <summary>
+        /// Get the properties of a lobby by name (if set).
+        /// </summary>
+        /// <param name="name">The name of the lobby.</param>
+        public async ValueTask<LobbyObject> GetLobbyByName(string name)
+        {
+            var endpoint = FormatPath("lobbies/name/{0}", name);
+            var response = await NormcoreServicesRequest.Get(endpoint).WithAuth(auth).Send();
+
+            if (response.Status == 200)
+            {
+                var lobby = response.ParseDataResponse<LobbyObject>();
             }
 
             // TODO handle expected failure responses
@@ -60,8 +85,8 @@ namespace Normcore.Services
         /// <returns>A list of lobby objects.</returns>
         public async ValueTask<LobbyObject[]> GetLobbies()
         {
-
-            var response = await NormcoreServicesRequest.Get($"lobbies").WithAuth(auth).Send();
+            var endpoint = FormatPath("apps/{0}/lobbies", appKey);
+            var response = await NormcoreServicesRequest.Get(endpoint).WithAuth(auth).Send();
 
             if (response.Status == 200)
             {
@@ -80,7 +105,8 @@ namespace Normcore.Services
         /// <returns></returns>
         public async ValueTask<UserObject[]> GetLobbyMembers(string lobbyID)
         {
-            var response = await NormcoreServicesRequest.Get($"lobbies/{lobbyID}/members").WithAuth(auth).Send();
+            var endpoint = FormatPath("apps/{0}/lobbies/{1}/members", appKey, lobbyID);
+            var response = await NormcoreServicesRequest.Get(endpoint).WithAuth(auth).Send();
 
             if (response.Status == 200)
             {
@@ -99,7 +125,8 @@ namespace Normcore.Services
         /// <returns>The user ID of the lobby owner.</returns>
         public async ValueTask<string> GetOwner(string lobbyID)
         {
-            var response = await NormcoreServicesRequest.Get($"lobbies/{lobbyID}/owner").WithAuth(auth).Send();
+            var endpoint = FormatPath("apps/{0}/lobbies/{1}/owner", appKey, lobbyID);
+            var response = await NormcoreServicesRequest.Get(endpoint).WithAuth(auth).Send();
 
             if (response.Status == 200)
             {
@@ -120,7 +147,8 @@ namespace Normcore.Services
         {
             var body = new SetLobbyOwnerRequestBody { ID = userID };
 
-            var response = await NormcoreServicesRequest.Put($"lobbies/{lobbyID}/owner", body).WithAuth(auth).Send();
+            var endpoint = FormatPath("apps/{0}/lobbies/{1}/owner", appKey, lobbyID);
+            var response = await NormcoreServicesRequest.Put(endpoint, body).WithAuth(auth).Send();
 
             if (response.Status == 204)
             {
@@ -133,14 +161,70 @@ namespace Normcore.Services
         }
 
         /// <summary>
-        /// Set the properties of a lobby.
+        /// Replace the name of a lobby.
         /// </summary>
         /// <param name="lobbyID">The ID of the lobby.</param>
-        public async ValueTask ModifyLobby(string lobbyID)
+        /// <param name="name">The new name of the lobby.</param>
+        public async ValueTask SetLobbyName(string lobbyID, string name)
         {
-            var body = new ModifyLobbyRequestBody();
+            await SetLobbyProperties(lobbyID, new SetLobbyOptions { Name = name });
+        }
 
-            var response = await NormcoreServicesRequest.Put($"lobbies/{lobbyID}", body).WithAuth(auth).Send();
+        /// <summary>
+        /// Replace the size of a lobby.
+        /// </summary>
+        /// <remarks>
+        /// Reducing the size of the lobby will not kick any excess members.
+        /// </remarks>
+        /// <param name="lobbyID">The ID of the lobby.</param>
+        /// <param name="size">The new size of the lobby.</param>
+        public async ValueTask SetLobbySize(string lobbyID, uint size)
+        {
+            await SetLobbyProperties(lobbyID, new SetLobbyOptions { Size = size });
+        }
+
+        /// <summary>
+        /// Replace the tags of a lobby.
+        /// </summary>
+        /// <param name="lobbyID">The ID of the lobby.</param>
+        /// <param name="tags">The new list of lobby tags.</param>
+        public async ValueTask SetLobbyTags(string lobbyID, string[] tags)
+        {
+            await SetLobbyProperties(lobbyID, new SetLobbyOptions { Tags = tags });
+        }
+
+        /// <summary>
+        /// Replace the custom data of a lobby.
+        /// </summary>
+        /// <remarks>
+        /// To add or remove individual keys from the custom data, use UpdateLobbyData.
+        /// </remarks>
+        /// <param name="lobbyID">The ID of the lobby.</param>
+        /// <param name="data">The new custom data of the lobby.</param>
+        public async ValueTask SetLobbyData(string lobbyID, LobbyDataContainer data)
+        {
+            await SetLobbyProperties(lobbyID, new SetLobbyOptions { Data = data });
+        }
+
+        /// <summary>
+        /// Replace multiple properties of a lobby.
+        /// </summary>
+        /// <remarks>
+        /// Any options passed here will replace the existing property of the lobby. To leave a property as is, leave the value as null.
+        /// </remarks>
+        /// <param name="lobbyID">The ID of the lobby.</param>
+        public async ValueTask SetLobbyProperties(string lobbyID, SetLobbyOptions options)
+        {
+            var body = new ModifyLobbyRequestBody
+            {
+                Name = options.Name,
+                Size = options.Size,
+                Tags = options.Tags,
+                Data = options.Data
+            };
+
+            var endpoint = FormatPath("apps/{0}/lobbies/{1}", appKey, lobbyID);
+            var response = await NormcoreServicesRequest.Put(endpoint, body).WithAuth(auth).Send();
 
             if (response.Status == 204)
             {
@@ -158,7 +242,8 @@ namespace Normcore.Services
         /// <param name="lobbyID">The ID of the lobby.</param>
         public async ValueTask<LobbyObject> JoinLobby(string lobbyID)
         {
-            var response = await NormcoreServicesRequest.Post($"lobbies/{lobbyID}/members").WithAuth(auth).Send();
+            var endpoint = FormatPath("apps/{0}/lobbies/{1}/members", appKey, lobbyID);
+            var response = await NormcoreServicesRequest.Post(endpoint).WithAuth(auth).Send();
 
             if (response.Status == 200)
             {
@@ -172,7 +257,11 @@ namespace Normcore.Services
 
         public async ValueTask<LobbyObject[]> QueryLobbies(LobbyQuery query)
         {
-            var response = await NormcoreServicesRequest.Post("lobbies/query", query).WithAuth(auth).Send();
+            var endpoint = FormatPath("apps/{0}/lobbies/query", appKey);
+            var response = await NormcoreServicesRequest
+                .Post(endpoint, query)
+                .WithAuth(auth)
+                .Send();
 
             if (response.Status == 200)
             {
@@ -195,7 +284,13 @@ namespace Normcore.Services
                 throw new NotImplementedException();
             }
 
-            var response = await NormcoreServicesRequest.Delete($"lobbies/{lobbyID}/members/{uauth.UserID}").WithAuth(auth).Send();
+            var endpoint = FormatPath(
+                "apps/{0}/lobbies/{1}/members/{2}",
+                appKey,
+                lobbyID,
+                uauth.UserID
+            );
+            var response = await NormcoreServicesRequest.Delete(endpoint).WithAuth(auth).Send();
 
             if (response.Status == 204)
             {
@@ -213,7 +308,8 @@ namespace Normcore.Services
         /// <param name="lobbyID">The ID of the lobby.</param>
         public async ValueTask CloseLobby(string lobbyID)
         {
-            var response = await NormcoreServicesRequest.Delete($"lobbies/{lobbyID}").WithAuth(auth).Send();
+            var endpoint = FormatPath("apps/{0}/lobbies/{1}", appKey, lobbyID);
+            var response = await NormcoreServicesRequest.Delete(endpoint).WithAuth(auth).Send();
 
             if (response.Status == 204)
             {
@@ -232,7 +328,8 @@ namespace Normcore.Services
         /// <param name="userID">The ID of the user to remove.</param>
         public async ValueTask RemoveMember(string lobbyID, string userID)
         {
-            var response = await NormcoreServicesRequest.Delete($"lobbies/{lobbyID}/members/{userID}").WithAuth(auth).Send();
+            var endpoint = FormatPath("apps/{0}/lobbies/{1}/members/{2}", appKey, lobbyID, userID);
+            var response = await NormcoreServicesRequest.Delete(endpoint).WithAuth(auth).Send();
 
             if (response.Status == 204)
             {
@@ -250,7 +347,8 @@ namespace Normcore.Services
         /// <returns></returns>
         public async ValueTask<LobbyObject[]> GetJoinedLobbies()
         {
-            var response = await NormcoreServicesRequest.Get($"lobbies/joined").WithAuth(auth).Send();
+            var endpoint = FormatPath("apps/{0}/lobbies/joined", appKey);
+            var response = await NormcoreServicesRequest.Get(endpoint).WithAuth(auth).Send();
 
             if (response.Status == 200)
             {
@@ -268,7 +366,8 @@ namespace Normcore.Services
 
             body.Data = update;
 
-            var response = await NormcoreServicesRequest.Post($"lobbies/{lobbyID}/data", body).WithAuth(auth).Send();
+            var endpoint = FormatPath("apps/{0}/lobbies/{1}/data", appKey, lobbyID);
+            var response = await NormcoreServicesRequest.Post(endpoint, body).WithAuth(auth).Send();
 
             if (response.Status == 200)
             {

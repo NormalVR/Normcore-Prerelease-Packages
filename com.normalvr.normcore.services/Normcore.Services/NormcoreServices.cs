@@ -50,13 +50,13 @@ namespace Normcore.Services
         /// <summary>
         /// Construct a new NormcoreServicesClient with the provided authentication.
         /// </summary>
-        public NormcoreServices(IAuthentication auth)
+        public NormcoreServices(IAuthentication auth, string key)
         {
             this.auth = auth;
 
-            Lobbies = new LobbiesService(auth);
-            Users = new UsersService(auth);
-            Status = new StatusService();
+            Lobbies = new LobbiesService(auth, key);
+            Users = new UsersService(auth, key);
+            Status = new StatusService(key);
         }
 
         /// <summary>

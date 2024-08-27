@@ -7,7 +7,7 @@ namespace Normcore.Services
     [JsonConverter(typeof(LobbyDataContainerConverter))]
     public class LobbyDataContainer
     {
-        public Dictionary<string, LobbyDataEntry> Entries = new (); // TODO use non allocating container
+        public Dictionary<string, LobbyDataEntry> Entries = new(); // TODO use non allocating container
 
         /// <summary>
         /// Shorthand for adding a public value to the data container.

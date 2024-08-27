@@ -22,7 +22,8 @@ namespace Normcore.Services
 
             return new NormcoreServicesResponse
             {
-                Status = (uint) req.responseCode, Body = req.downloadHandler?.text
+                Status = (uint)req.responseCode,
+                Body = req.downloadHandler?.text
             };
         }
 
