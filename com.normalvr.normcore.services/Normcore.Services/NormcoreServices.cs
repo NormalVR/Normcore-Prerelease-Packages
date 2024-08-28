@@ -56,7 +56,7 @@ namespace Normcore.Services
 
             Lobbies = new LobbiesService(auth, key);
             Users = new UsersService(auth, key);
-            Status = new StatusService(key);
+            Status = new StatusService();
         }
 
         /// <summary>

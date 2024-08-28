@@ -29,7 +29,8 @@ namespace Normcore.Services
             body.Data = data;
 
             var endpoint = FormatPath("apps/{0}/lobbies", appKey);
-            var response = await NormcoreServicesRequest.Post(endpoint, body).WithAuth(auth).Send();
+            var request = NormcoreServicesRequest.Post(endpoint, body).WithAuth(auth);
+            var response = await request.Send();
 
             if (response.Status == 200)
             {
@@ -38,7 +39,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
 
         /// <summary>
@@ -48,7 +49,8 @@ namespace Normcore.Services
         public async ValueTask<LobbyObject> GetLobby(string lobbyID)
         {
             var endpoint = FormatPath("apps/{0}/lobbies/{1}", appKey, lobbyID);
-            var response = await NormcoreServicesRequest.Get(endpoint).WithAuth(auth).Send();
+            var request = NormcoreServicesRequest.Get(endpoint).WithAuth(auth);
+            var response = await request.Send();
 
             if (response.Status == 200)
             {
@@ -57,7 +59,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
 
         /// <summary>
@@ -67,7 +69,8 @@ namespace Normcore.Services
         public async ValueTask<LobbyObject> GetLobbyByName(string name)
         {
             var endpoint = FormatPath("lobbies/name/{0}", name);
-            var response = await NormcoreServicesRequest.Get(endpoint).WithAuth(auth).Send();
+            var request = NormcoreServicesRequest.Get(endpoint).WithAuth(auth);
+            var response = await request.Send();
 
             if (response.Status == 200)
             {
@@ -76,7 +79,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
 
         /// <summary>
@@ -86,7 +89,8 @@ namespace Normcore.Services
         public async ValueTask<LobbyObject[]> GetLobbies()
         {
             var endpoint = FormatPath("apps/{0}/lobbies", appKey);
-            var response = await NormcoreServicesRequest.Get(endpoint).WithAuth(auth).Send();
+            var request = NormcoreServicesRequest.Get(endpoint).WithAuth(auth);
+            var response = await request.Send();
 
             if (response.Status == 200)
             {
@@ -95,7 +99,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
 
         /// <summary>
@@ -106,7 +110,8 @@ namespace Normcore.Services
         public async ValueTask<UserObject[]> GetLobbyMembers(string lobbyID)
         {
             var endpoint = FormatPath("apps/{0}/lobbies/{1}/members", appKey, lobbyID);
-            var response = await NormcoreServicesRequest.Get(endpoint).WithAuth(auth).Send();
+            var request = NormcoreServicesRequest.Get(endpoint).WithAuth(auth);
+            var response = await request.Send();
 
             if (response.Status == 200)
             {
@@ -115,7 +120,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
 
         /// <summary>
@@ -126,7 +131,8 @@ namespace Normcore.Services
         public async ValueTask<string> GetOwner(string lobbyID)
         {
             var endpoint = FormatPath("apps/{0}/lobbies/{1}/owner", appKey, lobbyID);
-            var response = await NormcoreServicesRequest.Get(endpoint).WithAuth(auth).Send();
+            var request = NormcoreServicesRequest.Get(endpoint).WithAuth(auth);
+            var response = await request.Send();
 
             if (response.Status == 200)
             {
@@ -135,7 +141,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
 
         /// <summary>
@@ -148,7 +154,8 @@ namespace Normcore.Services
             var body = new SetLobbyOwnerRequestBody { ID = userID };
 
             var endpoint = FormatPath("apps/{0}/lobbies/{1}/owner", appKey, lobbyID);
-            var response = await NormcoreServicesRequest.Put(endpoint, body).WithAuth(auth).Send();
+            var request = NormcoreServicesRequest.Put(endpoint, body).WithAuth(auth);
+            var response = await request.Send();
 
             if (response.Status == 204)
             {
@@ -157,7 +164,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
 
         /// <summary>
@@ -224,7 +231,8 @@ namespace Normcore.Services
             };
 
             var endpoint = FormatPath("apps/{0}/lobbies/{1}", appKey, lobbyID);
-            var response = await NormcoreServicesRequest.Put(endpoint, body).WithAuth(auth).Send();
+            var request = NormcoreServicesRequest.Put(endpoint, body).WithAuth(auth);
+            var response = await request.Send();
 
             if (response.Status == 204)
             {
@@ -233,7 +241,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
 
         /// <summary>
@@ -243,7 +251,8 @@ namespace Normcore.Services
         public async ValueTask<LobbyObject> JoinLobby(string lobbyID)
         {
             var endpoint = FormatPath("apps/{0}/lobbies/{1}/members", appKey, lobbyID);
-            var response = await NormcoreServicesRequest.Post(endpoint).WithAuth(auth).Send();
+            var request = NormcoreServicesRequest.Post(endpoint).WithAuth(auth);
+            var response = await request.Send();
 
             if (response.Status == 200)
             {
@@ -252,16 +261,14 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
 
         public async ValueTask<LobbyObject[]> QueryLobbies(LobbyQuery query)
         {
             var endpoint = FormatPath("apps/{0}/lobbies/query", appKey);
-            var response = await NormcoreServicesRequest
-                .Post(endpoint, query)
-                .WithAuth(auth)
-                .Send();
+            var request = NormcoreServicesRequest.Post(endpoint, query).WithAuth(auth);
+            var response = await request.Send();
 
             if (response.Status == 200)
             {
@@ -270,7 +277,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
 
         /// <summary>
@@ -290,7 +297,8 @@ namespace Normcore.Services
                 lobbyID,
                 uauth.UserID
             );
-            var response = await NormcoreServicesRequest.Delete(endpoint).WithAuth(auth).Send();
+            var request = NormcoreServicesRequest.Delete(endpoint).WithAuth(auth);
+            var response = await request.Send();
 
             if (response.Status == 204)
             {
@@ -299,7 +307,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
 
         /// <summary>
@@ -309,7 +317,8 @@ namespace Normcore.Services
         public async ValueTask CloseLobby(string lobbyID)
         {
             var endpoint = FormatPath("apps/{0}/lobbies/{1}", appKey, lobbyID);
-            var response = await NormcoreServicesRequest.Delete(endpoint).WithAuth(auth).Send();
+            var request = NormcoreServicesRequest.Delete(endpoint).WithAuth(auth);
+            var response = await request.Send();
 
             if (response.Status == 204)
             {
@@ -318,7 +327,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
 
         /// <summary>
@@ -329,7 +338,8 @@ namespace Normcore.Services
         public async ValueTask RemoveMember(string lobbyID, string userID)
         {
             var endpoint = FormatPath("apps/{0}/lobbies/{1}/members/{2}", appKey, lobbyID, userID);
-            var response = await NormcoreServicesRequest.Delete(endpoint).WithAuth(auth).Send();
+            var request = NormcoreServicesRequest.Delete(endpoint).WithAuth(auth);
+            var response = await request.Send();
 
             if (response.Status == 204)
             {
@@ -338,7 +348,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
 
         /// <summary>
@@ -348,7 +358,8 @@ namespace Normcore.Services
         public async ValueTask<LobbyObject[]> GetJoinedLobbies()
         {
             var endpoint = FormatPath("apps/{0}/lobbies/joined", appKey);
-            var response = await NormcoreServicesRequest.Get(endpoint).WithAuth(auth).Send();
+            var request = NormcoreServicesRequest.Get(endpoint).WithAuth(auth);
+            var response = await request.Send();
 
             if (response.Status == 200)
             {
@@ -357,7 +368,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
 
         public async ValueTask<LobbyObject> UpdateLobbyData(string lobbyID, LobbyDataUpdate update)
@@ -367,7 +378,8 @@ namespace Normcore.Services
             body.Data = update;
 
             var endpoint = FormatPath("apps/{0}/lobbies/{1}/data", appKey, lobbyID);
-            var response = await NormcoreServicesRequest.Post(endpoint, body).WithAuth(auth).Send();
+            var request = NormcoreServicesRequest.Post(endpoint, body).WithAuth(auth);
+            var response = await request.Send();
 
             if (response.Status == 200)
             {
@@ -376,7 +388,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
     }
 }

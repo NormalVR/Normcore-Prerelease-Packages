@@ -48,7 +48,8 @@ namespace Normcore.Services
         public static async ValueTask<CreateAnonymousUserResult> CreateAnonymousUser(string key)
         {
             var endpoint = FormatPath("apps/{0}/auth/anon/create", key);
-            var response = await NormcoreServicesRequest.Post(endpoint).Send();
+            var request = NormcoreServicesRequest.Post(endpoint);
+            var response = await request.Send();
 
             if (response.Status == 200)
             {
@@ -57,7 +58,7 @@ namespace Normcore.Services
 
             // TODO add expected error responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
 
         public static async ValueTask<AuthenticateAnonymousUserResult> AuthenticateAnonymousUser(
@@ -69,7 +70,8 @@ namespace Normcore.Services
             var body = new RefreshAnonymousUserTokenRequestData { ID = userID, Secret = secret };
 
             var endpoint = FormatPath("apps/{0}/auth/anon", key);
-            var response = await NormcoreServicesRequest.Post(endpoint, body).Send();
+            var request = NormcoreServicesRequest.Post(endpoint, body);
+            var response = await request.Send();
 
             if (response.Status == 200)
             {
@@ -78,7 +80,7 @@ namespace Normcore.Services
 
             // TODO add expected error responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
 
         // TODO add admin / service worker authentication

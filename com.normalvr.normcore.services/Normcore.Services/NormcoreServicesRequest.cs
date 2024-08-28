@@ -15,6 +15,16 @@ namespace Normcore.Services
 
         public UnityWebRequest UnityWebRequest;
 
+        internal NormcoreServicesException.RequestInfo GetExceptionInfo()
+        {
+            return new NormcoreServicesException.RequestInfo()
+            {
+                method = UnityWebRequest.method,
+                error = UnityWebRequest.error,
+                url = UnityWebRequest.url,
+            };
+        }
+
         /// <summary>
         /// Map an API endpoint to a full qualified URL using the Normcore settings.
         /// </summary>
@@ -126,12 +136,12 @@ namespace Normcore.Services
 
                 if (UnityWebRequest.result == UnityWebRequest.Result.ConnectionError)
                 {
-                    throw NormcoreServicesException.ConnectionError();
+                    throw NormcoreServicesException.ConnectionError(this);
                 }
 
                 if (UnityWebRequest.result == UnityWebRequest.Result.DataProcessingError)
                 {
-                    throw NormcoreServicesException.DataProcessingError();
+                    throw NormcoreServicesException.DataProcessingError(this);
                 }
 
                 // Result.Success and Result.ProtocolError both represent complete requests. The

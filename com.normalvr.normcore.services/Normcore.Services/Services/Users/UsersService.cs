@@ -21,7 +21,8 @@ namespace Normcore.Services
         public async ValueTask<UserObject> GetSelf()
         {
             var endpoint = FormatPath("apps/{0}/users/self", appKey);
-            var response = await NormcoreServicesRequest.Get(endpoint).WithAuth(auth).Send();
+            var request = NormcoreServicesRequest.Get(endpoint).WithAuth(auth);
+            var response = await request.Send();
 
             if (response.Status == 200)
             {
@@ -30,7 +31,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
 
         /// <summary>
@@ -39,7 +40,8 @@ namespace Normcore.Services
         public async ValueTask<UserObject> GetUser(string userID)
         {
             var endpoint = FormatPath("apps/{0}/users/{1}", appKey, userID);
-            var response = await NormcoreServicesRequest.Get(endpoint).WithAuth(auth).Send();
+            var request = NormcoreServicesRequest.Get(endpoint).WithAuth(auth);
+            var response = await request.Send();
 
             if (response.Status == 200)
             {
@@ -48,7 +50,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
 
         /// <summary>
@@ -57,7 +59,8 @@ namespace Normcore.Services
         public async ValueTask Heartbeat()
         {
             var endpoint = FormatPath("apps/{0}/users/heartbeat", appKey);
-            var response = await NormcoreServicesRequest.Post(endpoint).WithAuth(auth).Send();
+            var request = NormcoreServicesRequest.Post(endpoint).WithAuth(auth);
+            var response = await request.Send();
 
             if (response.Status == 204)
             {
@@ -66,7 +69,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(response);
+            throw NormcoreServicesException.UnexpectedResponse(request, response);
         }
     }
 }
