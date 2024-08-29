@@ -15,7 +15,9 @@ namespace Normcore.Services
         /// The raw response JSON, or null if the response body was empty.
         /// </summary>
         public string Body;
-
+        
+        internal NormcoreServicesException.RequestInfo RequestInfo;
+        
         public static NormcoreServicesResponse FromUnityWebRequest(UnityWebRequest req)
         {
             Debug.Assert(req.isDone);
@@ -23,7 +25,8 @@ namespace Normcore.Services
             return new NormcoreServicesResponse
             {
                 Status = (uint)req.responseCode,
-                Body = req.downloadHandler?.text
+                Body = req.downloadHandler?.text,
+                RequestInfo = new NormcoreServicesException.RequestInfo(req),
             };
         }
 

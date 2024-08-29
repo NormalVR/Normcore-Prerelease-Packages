@@ -31,7 +31,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
     }
 }

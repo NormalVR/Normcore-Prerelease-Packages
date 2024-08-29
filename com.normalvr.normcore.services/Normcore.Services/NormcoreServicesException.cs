@@ -1,5 +1,7 @@
 ﻿using System;
 
+using UnityEngine.Networking;
+
 namespace Normcore.Services
 {
     public class NormcoreServicesException : Exception
@@ -7,22 +9,36 @@ namespace Normcore.Services
         internal struct RequestInfo
         {
             public string method;
-            public string error;
             public string url;
+            public string error;
 
-            public string Format(string additionalMessage = "")
+            public RequestInfo(UnityWebRequest request)
             {
-                var result = $"[{method}: {url}]";
+                method = request.method;
+                url = request.url;
+                error = request.error;
+            }
+
+            public string Format(string message = "")
+            {
+                var result = string.Empty;
+                
+                if (!string.IsNullOrEmpty(message))
+                {
+                    result = message;
+                }
+                
+                if (!string.IsNullOrEmpty(method) && !string.IsNullOrEmpty(url))
+                {
+                    result += $"\n\n[{method}: {url}] ";
+                }
 
                 if (!string.IsNullOrEmpty(error))
                 {
-                    result += $" {error}";
+                    result += $"{error} ";
                 }
 
-                if (!string.IsNullOrEmpty(additionalMessage))
-                {
-                    result += $" - {additionalMessage}";
-                }
+                result += "\n";
 
                 return result;
             }
@@ -30,22 +46,21 @@ namespace Normcore.Services
 
         private NormcoreServicesException(RequestInfo requestInfo, string message = "") : base(requestInfo.Format(message))
         {
-
         }
 
-        internal static NormcoreServicesException ConnectionError(NormcoreServicesRequest request)
+        internal static NormcoreServicesException ConnectionError(RequestInfo request)
         {
-            return new NormcoreServicesException(request.GetExceptionInfo(), "Unable to connect to Normcore Services backend.");
+            return new NormcoreServicesException(request, "Unable to connect to Normcore Services backend.");
         }
 
-        internal static NormcoreServicesException DataProcessingError(NormcoreServicesRequest request)
+        internal static NormcoreServicesException DataProcessingError(RequestInfo request)
         {
-            return new NormcoreServicesException(request.GetExceptionInfo(), "Unable to process response from Normcore Services backend.");
+            return new NormcoreServicesException(request, "Unable to process response from Normcore Services backend.");
         }
 
-        internal static NormcoreServicesException UnexpectedResponse(NormcoreServicesRequest request, NormcoreServicesResponse resp)
+        internal static NormcoreServicesException UnexpectedResponse(NormcoreServicesResponse resp)
         {
-            return new NormcoreServicesException(request.GetExceptionInfo(), $"Unexpected response from the Normcore Services API: {resp.Status}");
+            return new NormcoreServicesException(resp.RequestInfo, $"Unexpected response from the Normcore Services API: {resp.Status}");
         }
     }
 }
