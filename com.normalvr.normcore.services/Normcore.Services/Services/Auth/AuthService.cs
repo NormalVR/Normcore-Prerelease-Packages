@@ -43,12 +43,12 @@ namespace Normcore.Services
 
     internal static class AuthService
     {
-        private const string NormcoreAppKeyHeader = "Normcore-App-Key";
+        private const string NormcoreApiKeyHeader = "Normcore-API-Key";
 
-        public static async ValueTask<CreateAnonymousUserResult> CreateAnonymousUser(string key)
+        public static async ValueTask<CreateAnonymousUserResult> CreateAnonymousUser(string appKey, string apiKey)
         {
-            var endpoint = FormatPath("apps/{0}/auth/anon/create", key);
-            var request = NormcoreServicesRequest.Post(endpoint);
+            var endpoint = FormatPath("apps/{0}/auth/anon/create", appKey);
+            var request = NormcoreServicesRequest.Post(endpoint).WithHeader(NormcoreApiKeyHeader, apiKey);
             var response = await request.Send();
 
             if (response.Status == 200)
@@ -58,7 +58,7 @@ namespace Normcore.Services
 
             // TODO add expected error responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
 
         public static async ValueTask<AuthenticateAnonymousUserResult> AuthenticateAnonymousUser(
@@ -80,7 +80,7 @@ namespace Normcore.Services
 
             // TODO add expected error responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
 
         // TODO add admin / service worker authentication

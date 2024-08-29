@@ -39,7 +39,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
 
         /// <summary>
@@ -68,18 +68,18 @@ namespace Normcore.Services
         /// <param name="name">The name of the lobby.</param>
         public async ValueTask<LobbyObject> GetLobbyByName(string name)
         {
-            var endpoint = FormatPath("lobbies/name/{0}", name);
+            var endpoint = FormatPath("apps/{0}/lobbies/name/{1}", appKey, name);
             var request = NormcoreServicesRequest.Get(endpoint).WithAuth(auth);
             var response = await request.Send();
 
             if (response.Status == 200)
             {
-                var lobby = response.ParseDataResponse<LobbyObject>();
+                return response.ParseDataResponse<LobbyObject>();
             }
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
 
         /// <summary>
@@ -141,7 +141,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
 
         /// <summary>
@@ -164,7 +164,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
 
         /// <summary>
@@ -241,7 +241,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
 
         /// <summary>
@@ -261,7 +261,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
 
         public async ValueTask<LobbyObject[]> QueryLobbies(LobbyQuery query)
@@ -277,7 +277,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
 
         /// <summary>
@@ -307,7 +307,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
 
         /// <summary>
@@ -327,7 +327,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
 
         /// <summary>
@@ -348,7 +348,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
 
         /// <summary>
@@ -368,7 +368,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
 
         public async ValueTask<LobbyObject> UpdateLobbyData(string lobbyID, LobbyDataUpdate update)
@@ -388,7 +388,7 @@ namespace Normcore.Services
 
             // TODO handle expected failure responses
 
-            throw NormcoreServicesException.UnexpectedResponse(request, response);
+            throw NormcoreServicesException.UnexpectedResponse(response);
         }
     }
 }

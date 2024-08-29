@@ -14,7 +14,7 @@ namespace Normcore.Services
         /// <returns></returns>
         public static async ValueTask<AnonymousUserAuthentication> CreateAnonymousUser(string key)
         {
-            var result = await AuthService.CreateAnonymousUser(key);
+            var result = await AuthService.CreateAnonymousUser(key, key);
 
             return new AnonymousUserAuthentication
             {
