@@ -43,6 +43,33 @@ namespace Normcore.Services
         }
 
         /// <summary>
+        /// Create a lobby if one does not yet exist with the same name.
+        /// </summary>
+        /// <returns>The lobby properties.</returns>
+        public async ValueTask<LobbyObject> CreateOrGetLobby(uint size, string[] tags, LobbyDataContainer data, string name)
+        {
+            var body = new CreateLobbyRequestBody();
+
+            body.Name = name;
+            body.Size = size;
+            body.Tags = tags;
+            body.Data = data;
+
+            var endpoint = FormatPath("apps/{0}/lobbies/create-or-get", appKey);
+            var request = NormcoreServicesRequest.Post(endpoint, body).WithAuth(auth);
+            var response = await request.Send();
+
+            if (response.Status == 200)
+            {
+                return response.ParseDataResponse<LobbyObject>();
+            }
+
+            // TODO handle expected failure responses
+
+            throw NormcoreServicesException.UnexpectedResponse(response);
+        }
+
+        /// <summary>
         /// Get the properties of a lobby.
         /// </summary>
         /// <param name="lobbyID">The ID of the lobby.</param>
