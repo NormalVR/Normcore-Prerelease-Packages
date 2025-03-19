@@ -3,9 +3,8 @@
 namespace Normcore.Services
 {
     /// <summary>
-    /// A wrapper around a string that makes it a value type instead of a reference type.
-    /// For compatibility with the argument pattern used in <see cref="LobbiesService.SetLobbyProperties"/>.
-    /// TODO: Think of a better solution.; relevant: https://google.aip.dev/149
+    /// A wrapper around a string that makes it a value type instead of a reference type
+    /// for compatibility with the argument pattern used in <see cref="SetLobbyOptions"/>.
     /// </summary>
     [JsonConverter(typeof(LobbyDataContainerConverter))]
     public struct LobbyName
