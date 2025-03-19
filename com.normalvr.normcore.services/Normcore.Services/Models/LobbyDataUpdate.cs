@@ -4,13 +4,23 @@ using Newtonsoft.Json;
 
 namespace Normcore.Services
 {
+    /// <summary>
+    /// A container that stores changes to custom data.
+    /// </summary>
     [JsonConverter(typeof(LobbyDataUpdateConverter))]
     public class LobbyDataUpdate
     {
-        public Dictionary<string, LobbyDataEntry?> Changes = new(); // TODO use non allocating collection
+        /// <summary>
+        /// The custom data changes.
+        /// </summary>
+        /// <remarks>
+        /// A <see langword="null"/> value indicates the entry will be deleted, otherwise it
+        /// represents the updated value.
+        /// </remarks>
+        public Dictionary<string, LobbyDataEntry?> Changes = new();
 
         /// <summary>
-        /// Record a change to create or update a value in the lobby data.
+        /// Create or update a value in the custom data.
         /// </summary>
         /// <param name="key">The key to add or replace.</param>
         /// <param name="value">The updated value.</param>
@@ -20,7 +30,7 @@ namespace Normcore.Services
         }
 
         /// <summary>
-        /// Record a change to delete a value from the lobby data.
+        /// Delete a value from the custom data.
         /// </summary>
         /// <param name="key">The key to delete.</param>
         public void DeleteValue(string key)
@@ -38,7 +48,7 @@ namespace Normcore.Services
 
         public override LobbyDataUpdate ReadJson(JsonReader reader, Type objectType, LobbyDataUpdate existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            throw new NotImplementedException(); // there should be no reason to read this value
+            throw new System.NotImplementedException(); // there should be no reason to read this value
         }
     }
 }

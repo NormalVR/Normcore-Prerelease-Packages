@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace Normcore.Services
 {
+    /// <summary>
+    /// The types of data allowed in a <see cref="LobbyDataValue"/>.
+    /// </summary>
     public enum LobbyDataValueType
     {
         Invalid = 0,
@@ -12,11 +15,14 @@ namespace Normcore.Services
         String = 3,
     }
 
+    /// <summary>
+    /// A data value which can be stored in a <see cref="LobbyDataContainer"/>.
+    /// </summary>
     [JsonConverter(typeof(LobbyDataValueConverter))]
-    public readonly struct LobbyDataValue
+    public readonly struct LobbyDataValue : IEquatable<LobbyDataValue>
     {
         /// <summary>
-        /// The lobby data value type.
+        /// The data value type.
         /// </summary>
         public readonly LobbyDataValueType Type;
 
@@ -44,7 +50,7 @@ namespace Normcore.Services
             NumberValue = null;
         }
 
-        public LobbyDataValue(double value)
+        public LobbyDataValue(long value)
         {
             Type = LobbyDataValueType.Number;
 
@@ -53,7 +59,7 @@ namespace Normcore.Services
             StringValue = null;
         }
 
-        public LobbyDataValue(long value)
+        public LobbyDataValue(double value)
         {
             Type = LobbyDataValueType.Number;
 
@@ -72,39 +78,42 @@ namespace Normcore.Services
         }
 
         /// <summary>
-        /// Returns the value as a bool. Throws an exception if the value is not a boolean type.
+        /// Returns the value as a bool.
         /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown if the value is not a boolean type.</exception>
         public bool AsBool()
         {
             if (!BoolValue.HasValue)
             {
-                throw new Exception("The value is not a boolean type.");
+                throw new InvalidOperationException("The value is not a boolean type.");
             }
 
             return BoolValue.Value;
         }
 
         /// <summary>
-        /// Returns the number value as a double. Throws an exception if the value is not a number type.
+        /// Returns the number value as a double.
         /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown if the value is not a number type.</exception>
         public double AsDouble()
         {
             if (!NumberValue.HasValue)
             {
-                throw new Exception("The value is not a number type.");
+                throw new InvalidOperationException("The value is not a number type.");
             }
 
             return NumberValue.Value;
         }
 
         /// <summary>
-        /// Returns the string value. Throws an exception if the value is not a string type.
+        /// Returns the string value.
         /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown if the value is not a string type.</exception>
         public string AsString()
         {
             if (StringValue == null)
             {
-                throw new Exception("The value is not a string type.");
+                throw new InvalidOperationException("The value is not a string type.");
             }
 
             return StringValue;
@@ -115,27 +124,61 @@ namespace Normcore.Services
             Debug.Assert(Type == LobbyDataValueType.Invalid || BoolValue.HasValue != NumberValue.HasValue != (StringValue != null));
         }
 
+        /// <inheritdoc />
+        public bool Equals(LobbyDataValue other)
+        {
+            return Type switch
+            {
+                LobbyDataValueType.Invalid when other.Type == LobbyDataValueType.Invalid => true,
+                LobbyDataValueType.Boolean when other.Type == LobbyDataValueType.Boolean => BoolValue == other.BoolValue,
+                LobbyDataValueType.Number  when other.Type == LobbyDataValueType.Number  => NumberValue == other.NumberValue,
+                LobbyDataValueType.String  when other.Type == LobbyDataValueType.String  => StringValue == other.StringValue,
+                _                                                              => false,
+            };
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            return obj is LobbyDataValue other && Equals(other);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return HashCode.Combine((int)Type, BoolValue, NumberValue, StringValue);
+        }
+
+        /// <inheritdoc />
         public override string ToString()
         {
             AssertValidUnion();
 
             if (BoolValue.HasValue)
             {
-                return $"LobbyDataValue({BoolValue.Value})";
+                return $"{nameof(LobbyDataValue)}({BoolValue.Value})";
             }
 
             if (NumberValue.HasValue)
             {
-                return $"LobbyDataValue({NumberValue.Value})";
+                return $"{nameof(LobbyDataValue)}({NumberValue.Value})";
             }
 
             if (StringValue != null)
             {
-                return $"LobbyDataValue(\"{StringValue}\")";
+                return $"{nameof(LobbyDataValue)}(\"{StringValue}\")";
             }
 
-            throw new Exception("The LobbyDataValue is invalid.");
+            throw new Exception($"The {nameof(LobbyDataValue)} is invalid.");
         }
+
+        public static bool operator ==(LobbyDataValue left, LobbyDataValue right) => left.Equals(right);
+        public static bool operator !=(LobbyDataValue left, LobbyDataValue right) => !left.Equals(right);
+        
+        public static implicit operator LobbyDataValue(bool value) => new LobbyDataValue(value);
+        public static implicit operator LobbyDataValue(long value) => new LobbyDataValue(value);
+        public static implicit operator LobbyDataValue(double value) => new LobbyDataValue(value);
+        public static implicit operator LobbyDataValue(string value) => new LobbyDataValue(value);
     }
 
     internal class LobbyDataValueConverter : JsonConverter<LobbyDataValue>
@@ -156,33 +199,20 @@ namespace Normcore.Services
             }
             else
             {
-                throw new Exception("The LobbyDataValue is invalid");
+                throw new Exception($"The {nameof(LobbyDataValue)} is invalid");
             }
         }
 
         public override LobbyDataValue ReadJson(JsonReader reader, Type objectType, LobbyDataValue existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            if (reader.Value is bool b)
+            return reader.Value switch
             {
-                return new LobbyDataValue(b);
-            }
-
-            if (reader.Value is long n)
-            {
-                return new LobbyDataValue(n);
-            }
-
-            if (reader.Value is double d)
-            {
-                return new LobbyDataValue(d);
-            }
-
-            if (reader.Value is string s)
-            {
-                return new LobbyDataValue(s);
-            }
-
-            throw new ArgumentException($"Unexpected token type while reading lobby data value: {reader.TokenType}");
+                bool b => new LobbyDataValue(b),
+                long n => new LobbyDataValue(n),
+                double d => new LobbyDataValue(d),
+                string s => new LobbyDataValue(s),
+                _ => throw new ArgumentException($"Unexpected token type while reading data value: {reader.TokenType}"),
+            };
         }
     }
 }

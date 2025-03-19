@@ -1,6 +1,6 @@
 {
     "name": "Normcore.Services",
-    "rootNamespace": "",
+    "rootNamespace": "Normcore.Services",
     "references": [
         "UniTask"
     ],
